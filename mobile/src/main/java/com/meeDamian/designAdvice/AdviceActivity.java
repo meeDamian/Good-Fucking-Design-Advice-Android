@@ -1,57 +1,45 @@
 package com.meeDamian.designAdvice;
 
 import android.app.Activity;
-import android.content.ContentValues;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.View;
+import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.meedamian.common.Advice;
 import com.meedamian.common.MyDatabase;
-import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
 
-public class AdviceActivity extends Activity {
+public class AdviceActivity extends Activity implements ImageButton.OnClickListener {
 
-    private SQLiteAssetHelper mDbHelper;
+    private MyDatabase db;
+    private TextView advice;
+    private TextView adviceId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_advice);
-        mDbHelper = new MyDatabase(this);
 
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
-        Cursor c = db.query("advices",
-            new String[] {
-                "id",
-                "advice",
-                "shown"
-            },
-            null,
-            null,
-            null,
-            null,
-            "shown ASC",
-            "1"
-        );
+        db = new MyDatabase(this);
 
-        c.moveToFirst();
-        Advice a = new Advice(c);
+        advice = (TextView) findViewById(R.id.advice);
+        adviceId = (TextView) findViewById(R.id.adviceId);
 
-        Log.d("lalala", "" + a.getId() + ") " + a.getBody());
+        ImageButton nextAdvice = (ImageButton) findViewById(R.id.nextAdvice);
+        nextAdvice.setOnClickListener(this);
 
-        ContentValues updatedCount = new ContentValues();
-        updatedCount.put(Advice.SHOWN_COUNT, a.getShownCount() + 1);
-
-        db.update("advices",
-            updatedCount,
-            "id=?",
-            new String[] {
-                "" + a.getId()
-            }
-        );
-        c.close();
+        setNewAdvice();
     }
 
+    private void setNewAdvice() {
+        Advice a = db.getNewAdvice();
+
+        adviceId.setText(a.getId() + ".");
+        advice.setText(a.getBody());
+    }
+
+    @Override
+    public void onClick(View v) {
+        setNewAdvice();
+    }
 }

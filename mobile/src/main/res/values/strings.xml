@@ -4,5 +4,6 @@
     <string name="app_name">Good Fucking Design Advice</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="refresh_advice">Refresh Advice</string>
 
 </resources>
