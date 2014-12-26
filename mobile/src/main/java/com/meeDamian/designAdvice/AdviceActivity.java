@@ -29,6 +29,7 @@ public class AdviceActivity extends Activity implements ImageButton.OnClickListe
         nextAdvice.setOnClickListener(this);
 
         setNewAdvice();
+        AlarmHelper.setAlarm(this, AlarmHelper.ALARM_HOUR);
     }
 
     private void setNewAdvice() {
