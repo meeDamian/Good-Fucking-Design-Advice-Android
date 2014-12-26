@@ -21,19 +21,14 @@ public class MyDatabase extends SQLiteAssetHelper {
     }
 
     public Advice getNewAdvice() {
-        Cursor c = db.query("advices",
-            new String[] {
-                "id",
-                "advice",
-                "shown"
-            },
-            null,
-            null,
-            null,
-            null,
-            "shown ASC",
-            "1"
+        Cursor c = db.rawQuery("SELECT * " +
+            "FROM advices " +
+            "WHERE shown=(SELECT MIN(shown) FROM advices) " +
+            "ORDER BY RANDOM() " +
+            "LIMIT 1",
+            null
         );
+
         c.moveToFirst();
 
         Advice a = new Advice(c);
