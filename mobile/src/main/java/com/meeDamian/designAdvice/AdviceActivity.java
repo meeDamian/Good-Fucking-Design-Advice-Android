@@ -28,12 +28,22 @@ public class AdviceActivity extends Activity implements ImageButton.OnClickListe
         ImageButton nextAdvice = (ImageButton) findViewById(R.id.nextAdvice);
         nextAdvice.setOnClickListener(this);
 
-        setNewAdvice();
+        Bundle extras = getIntent().getExtras();
+        String id = extras != null
+            ? extras.getString("id")
+            : null;
+
+        setNewAdvice(id);
+
+        NotificationHelper.la(this);
+
         AlarmHelper.setAlarm(this, AlarmHelper.ALARM_HOUR);
     }
 
-    private void setNewAdvice() {
-        Advice a = db.getNewAdvice();
+    private void setNewAdvice(String id) {
+        Advice a = id != null
+            ? db.getNewAdvice(id)
+            : db.getNewAdvice();
 
         adviceId.setText(a.getId() + ".");
         advice.setText(a.getBody());
@@ -41,6 +51,6 @@ public class AdviceActivity extends Activity implements ImageButton.OnClickListe
 
     @Override
     public void onClick(View v) {
-        setNewAdvice();
+        setNewAdvice(null);
     }
 }

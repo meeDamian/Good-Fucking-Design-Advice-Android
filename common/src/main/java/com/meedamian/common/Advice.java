@@ -20,6 +20,9 @@ public class Advice {
     public String getId() {
         return id.toString();
     }
+    public Integer getIntegerId() {
+        return id;
+    }
 
     public String getBody() {
         return body;

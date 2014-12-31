@@ -20,15 +20,31 @@ public class MyDatabase extends SQLiteAssetHelper {
         db = getWritableDatabase();
     }
 
-    public Advice getNewAdvice() {
-        Cursor c = db.rawQuery("SELECT * " +
-            "FROM advices " +
-            "WHERE shown=(SELECT MIN(shown) FROM advices) " +
-            "ORDER BY RANDOM() " +
-            "LIMIT 1",
+    private Cursor getCursor() {
+        return db.rawQuery("SELECT * " +
+                "FROM advices " +
+                "WHERE shown=(SELECT MIN(shown) FROM advices) " +
+                "ORDER BY RANDOM() " +
+                "LIMIT 1",
             null
         );
+    }
 
+    private Cursor getCursor(String adviceId) {
+        return db.query(
+            "advices",
+            null,
+            "id=?",
+            new String[] {
+                adviceId
+            },
+            null,
+            null,
+            null
+        );
+    }
+
+    private Advice getNewAdvice(Cursor c) {
         c.moveToFirst();
 
         Advice a = new Advice(c);
@@ -39,11 +55,19 @@ public class MyDatabase extends SQLiteAssetHelper {
             updatedCount,
             "id=?",
             new String[] {
-                "" + a.getId()
+                a.getId()
             }
         );
         c.close();
 
         return a;
+    }
+
+    public Advice getNewAdvice() {
+        return getNewAdvice(getCursor());
+    }
+
+    public Advice getNewAdvice(String adviceId) {
+        return getNewAdvice(getCursor(adviceId));
     }
 }
