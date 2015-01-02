@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.annotation.NonNull;
 
 import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
 
@@ -14,7 +15,7 @@ public class MyDatabase extends SQLiteAssetHelper {
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "advices.db";
 
-    public MyDatabase(Context context) {
+    public MyDatabase(@NonNull Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
 
         db = getWritableDatabase();
@@ -67,7 +68,7 @@ public class MyDatabase extends SQLiteAssetHelper {
         return getNewAdvice(getCursor());
     }
 
-    public Advice getNewAdvice(String adviceId) {
+    public Advice getNewAdvice(@NonNull String adviceId) {
         return getNewAdvice(getCursor(adviceId));
     }
 }

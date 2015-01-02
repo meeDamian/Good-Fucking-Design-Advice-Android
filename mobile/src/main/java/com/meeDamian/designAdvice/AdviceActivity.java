@@ -2,6 +2,7 @@ package com.meeDamian.designAdvice;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -40,7 +41,7 @@ public class AdviceActivity extends Activity implements ImageButton.OnClickListe
         AlarmHelper.setAlarm(this, AlarmHelper.ALARM_HOUR);
     }
 
-    private void setNewAdvice(String id) {
+    private void setNewAdvice(@Nullable String id) {
         Advice a = id != null
             ? db.getNewAdvice(id)
             : db.getNewAdvice();

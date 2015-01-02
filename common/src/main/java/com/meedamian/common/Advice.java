@@ -1,6 +1,7 @@
 package com.meedamian.common;
 
 import android.database.Cursor;
+import android.support.annotation.NonNull;
 
 public class Advice {
     public static final String ID = "id";
@@ -11,7 +12,7 @@ public class Advice {
     private String body;
     private int shownCount;
 
-    public Advice(Cursor c) {
+    public Advice(@NonNull Cursor c) {
         body = c.getString(c.getColumnIndex(BODY));
         id = c.getInt(c.getColumnIndex(ID));
         shownCount = c.getInt(c.getColumnIndex(SHOWN_COUNT));

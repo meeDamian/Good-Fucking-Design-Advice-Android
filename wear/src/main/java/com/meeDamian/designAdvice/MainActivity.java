@@ -24,10 +24,10 @@ public class MainActivity extends Activity {
         stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
             @Override
             public void onLayoutInflated(WatchViewStub stub) {
-                advice = (TextView) stub.findViewById(R.id.advice);
+            advice = (TextView) stub.findViewById(R.id.advice);
 
-                Advice a = db.getNewAdvice();
-                advice.setText(a.getBody());
+            Advice a = db.getNewAdvice();
+            advice.setText(a.getBody());
             }
         });
     }

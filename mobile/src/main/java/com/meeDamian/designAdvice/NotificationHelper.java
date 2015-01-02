@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 
@@ -13,7 +14,7 @@ import com.meedamian.common.MyDatabase;
 
 public class NotificationHelper extends BroadcastReceiver {
 
-    public static void la(Context context) {
+    public static void la(@NonNull Context context) {
         Advice a = new MyDatabase(context).getNewAdvice();
 
         String title = "Good Fucking Design Advice";
