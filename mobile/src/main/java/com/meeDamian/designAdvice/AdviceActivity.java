@@ -1,8 +1,12 @@
 package com.meeDamian.designAdvice;
 
 import android.app.Activity;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -41,13 +45,33 @@ public class AdviceActivity extends Activity implements ImageButton.OnClickListe
         AlarmHelper.setAlarm(this, AlarmHelper.ALARM_HOUR);
     }
 
+    @Override
+    protected void onResume() {
+        int visibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+            | View.SYSTEM_UI_FLAG_FULLSCREEN;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+            visibility |= View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+
+        View decorView = getWindow().getDecorView();
+        decorView.setSystemUiVisibility(visibility);
+
+
+        super.onResume();
+    }
+
     private void setNewAdvice(@Nullable String id) {
         Advice a = id != null
             ? db.getNewAdvice(id)
             : db.getNewAdvice();
 
         adviceId.setText(a.getId() + ".");
-        advice.setText(a.getBody());
+        SpannableString aoe = new SpannableString(a.getBody());
+        aoe.setSpan(new ForegroundColorSpan(Color.rgb(248, 68, 68)), aoe.length()-1, aoe.length(), 0);
+        advice.setText(aoe);
     }
 
     @Override
