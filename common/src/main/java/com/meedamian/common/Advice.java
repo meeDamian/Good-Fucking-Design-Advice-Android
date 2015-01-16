@@ -28,6 +28,9 @@ public class Advice {
     public String getBody() {
         return body;
     }
+    public String getUrl() {
+        return "http://goodfuckingdesignadvice.com/advice/" + getId() + "/";
+    }
 
     public int incShownCount() {
         shownCount++;
