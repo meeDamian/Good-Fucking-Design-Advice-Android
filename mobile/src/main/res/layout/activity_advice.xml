@@ -1,42 +1,66 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".AdviceActivity">
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context=".AdviceActivity">
 
-    <TextView android:id="@+id/advice"
+    <com.meedamian.common.AutoResizeTextView
+        android:id="@+id/advice"
 
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_marginRight="16dp"
         android:layout_marginLeft="16dp"
 
-        android:fontFamily="@string/font_fontFamily_medium"
+        tools:ignore="MissingPrefix"
+        fontPath="fonts/Roboto-Bold.ttf"
         android:textStyle="bold"
         android:textSize="75sp"
         android:textColor="@android:color/black"
 
+        android:gravity="center_vertical"
         android:layout_centerInParent="true"
 
         tools:text="@string/dummy_content" />
 
     <TextView android:id="@+id/adviceId"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@id/advice"
-        android:layout_centerHorizontal="true"
-        android:visibility="gone"
-        tools:text="7" />
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+
+              android:layout_margin="16dp"
+              android:textSize="20sp"
+
+              android:layout_alignParentTop="true"
+              android:layout_alignParentLeft="true"
+              android:layout_alignParentStart="true"
+
+
+              tools:text="#7" />
 
     <ImageButton android:id="@+id/nextAdvice"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_refresh_grey600_48dp"
-        android:layout_below="@id/advice"
-        android:layout_centerHorizontal="true"
-        android:background="@android:color/transparent"
-        android:visibility="gone"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:src="@drawable/ic_refresh_grey600_48dp"
+                 android:layout_margin="3dp"
+                 android:layout_alignParentBottom="true"
+                 android:layout_alignParentRight="true"
+                 android:layout_alignParentEnd="true"
+                 android:background="@android:color/transparent"
 
-        android:contentDescription="@string/refresh_advice" />
+                 android:contentDescription="@string/refresh_advice" />
+
+    <ImageButton android:id="@+id/share"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:src="@drawable/ic_refresh_grey600_48dp"
+                 android:layout_margin="3dp"
+                 android:layout_alignParentTop="true"
+                 android:layout_alignParentRight="true"
+                 android:layout_alignParentEnd="true"
+                 android:background="@android:color/transparent"
+
+                 android:contentDescription="@string/refresh_advice" />
+
+
 
 </RelativeLayout>
