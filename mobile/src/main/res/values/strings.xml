@@ -3,6 +3,7 @@
 
     <string name="app_name">Good Fucking Design Advice</string>
     <string name="refresh_advice">Refresh Advice</string>
+    <string name="share_advice">Share Advice</string>
     <string name="dummy_content">Start a fucking side project.</string>
 
 </resources>

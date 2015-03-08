@@ -42,7 +42,7 @@ public class NotificationHelper extends BroadcastReceiver {
             actionIntent,
             0
         );
-        mBuilder.addAction(R.drawable.ic_refresh_grey600_36dp, "another", next);
+        mBuilder.addAction(R.drawable.ic_refresh_grey600_48dp, "another", next);
 
 
         Intent clickIntent = new Intent(context, AdviceActivity.class);
