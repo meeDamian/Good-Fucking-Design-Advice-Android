@@ -7,7 +7,6 @@ import android.graphics.Typeface;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
-import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.widget.TextView;
@@ -15,19 +14,14 @@ import android.widget.TextView;
 import java.util.Arrays;
 import java.util.Comparator;
 
-/**
- * a textView that is able to self-adjust its font size depending on the min and max size of the font, and its own size.<br/>
- * code is heavily based on this StackOverflow thread:
- * http://stackoverflow.com/questions/16017165/auto-fit-textview-for-android/21851239#21851239 <br/>
- * It should work fine with most Android versions, but might have some issues on Android 3.1 - 4.04, as setTextSize will only work for the first time. <br/>
- * More info here: https://code.google.com/p/android/issues/detail?id=22493 and here in case you wish to fix it: http://stackoverflow.com/a/21851239/878126
- */
 public class AutoResizeTextView extends TextView {
+
     private static final int NO_LINE_LIMIT = -1;
+    private static final int MIN_FONT_SIZE = 12;
 
 
     private final RectF availableSpaceRect = new RectF();
-    private final SizeTester sizeTester;
+    private final SizeTester sizeTester = new SizeTester();
 
 
     private float minTextSize;
@@ -39,9 +33,6 @@ public class AutoResizeTextView extends TextView {
 
     private int maxWidth;
     private int maxLines;
-
-
-    private Cache cache = null;
 
     private boolean initiated = false;
     private TextPaint paint;
@@ -57,7 +48,7 @@ public class AutoResizeTextView extends TextView {
         super(context, attrs, defStyle);
 
         // using the minimal recommended font size
-        minTextSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12, getResources().getDisplayMetrics());
+        minTextSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, MIN_FONT_SIZE, getResources().getDisplayMetrics());
         maxTextSize = getTextSize();
 
         // no value was assigned during construction
@@ -65,7 +56,6 @@ public class AutoResizeTextView extends TextView {
             maxLines = NO_LINE_LIMIT;
 
         // prepare size tester:
-        sizeTester = new SizeTester();
         initiated = true;
     }
 
@@ -77,11 +67,11 @@ public class AutoResizeTextView extends TextView {
     public int getMaxLines() {
         return maxLines;
     }
-
     @Override
     public void setMaxLines(final int maxLines) {
         super.setMaxLines(maxLines);
         this.maxLines = maxLines;
+
         adjustTextSize();
     }
 
@@ -89,20 +79,21 @@ public class AutoResizeTextView extends TextView {
     public void setSingleLine() {
         super.setSingleLine();
         maxLines = 1;
+
         adjustTextSize();
     }
-
     @Override
     public void setSingleLine(final boolean singleLine) {
         super.setSingleLine(singleLine);
         maxLines = singleLine ? 1 : -1;
+
         adjustTextSize();
     }
-
     @Override
     public void setLines(final int lines) {
         super.setLines(lines);
         maxLines = lines;
+
         adjustTextSize();
     }
 
@@ -120,6 +111,7 @@ public class AutoResizeTextView extends TextView {
     @Override
     public void setTextSize(final float size) {
         maxTextSize = size;
+
         adjustTextSize();
     }
 
@@ -133,6 +125,7 @@ public class AutoResizeTextView extends TextView {
 
     public void setMinTextSize(final float minTextSize) {
         this.minTextSize = minTextSize;
+
         adjustTextSize();
     }
 
@@ -152,40 +145,50 @@ public class AutoResizeTextView extends TextView {
         final int startSize = (int) minTextSize;
         final int heightLimit = getMeasuredHeight() - getCompoundPaddingBottom() - getCompoundPaddingTop();
         maxWidth = getMeasuredWidth() - getCompoundPaddingLeft() - getCompoundPaddingRight();
-        if (maxWidth <= 0)
+        if (maxWidth <= 0) {
             return;
+        }
 
         availableSpaceRect.right = maxWidth;
         availableSpaceRect.bottom = heightLimit;
-        super.setTextSize(TypedValue.COMPLEX_UNIT_PX, efficientTextSizeSearch(startSize, (int) maxTextSize, availableSpaceRect));
+
+        // new approach
+        String text = getText().toString();
+        int b = betterSearch(startSize, (int) maxTextSize, getTheLongestWord(text), true);
+        int c = betterSearch(startSize, b, text);
+
+        super.setTextSize(TypedValue.COMPLEX_UNIT_PX, c);
     }
 
-    private int efficientTextSizeSearch(final int start, final int end, final RectF availableSpace) {
-        return binarySearch(start, end, availableSpace);
-    }
+    private int betterSearch(int smallestSize, int biggestSize, String text, boolean forceOneLine) {
+        int lastBest = smallestSize + (biggestSize + smallestSize) / 2;
 
-    private int binarySearch(final int start, final int end, final RectF availableSpace) {
-        int lastBest = start;
-        int lo = start;
-        int hi = end - 1;
-        int mid;
-        while (lo <= hi) {
-            mid = lo + hi >>> 1;
-            final int midValCmp = sizeTester.testSize(mid, availableSpace);
-            if (midValCmp < 0) {
-                lastBest = lo;
-                lo = mid + 1;
+        while (true) {
+            if (lastBest == smallestSize || lastBest == biggestSize)
+                return lastBest;
 
-            } else if (midValCmp > 0) {
-                hi = mid - 1;
-                lastBest = hi;
+            if (Math.abs(biggestSize - smallestSize) <= 3)
+                return lastBest;
 
-            } else return mid;
+            boolean tooSmall = sizeTester.testSize(text, lastBest, forceOneLine);
+
+            if (tooSmall) {
+                smallestSize = lastBest;
+                int oneThirdOfDiff = (biggestSize - lastBest) / 3;
+                lastBest += oneThirdOfDiff;
+
+            } else {
+                biggestSize = lastBest;
+                int oneThirdOfDiff = (lastBest - smallestSize) / 3;
+                lastBest -= oneThirdOfDiff;
+
+            }
         }
-        // make sure to return last best
-        // this is what should always be returned
-        return lastBest;
     }
+    private int betterSearch(int smallestSize, int biggestSize, String text) {
+        return betterSearch(smallestSize, biggestSize, text, false);
+    }
+
 
     @Override
     protected void onTextChanged(final CharSequence text, final int start, final int before, final int after) {
@@ -199,73 +202,47 @@ public class AutoResizeTextView extends TextView {
         if (width != oldWidth || height != oldHeight)
             adjustTextSize();
     }
+    private String getTheLongestWord(String text) {
+        String[] words = text.split("((?<=-)|\\s+)");
+        Arrays.sort(words, new Comparator<String>() {
+            @Override
+            public int compare(String lhs, String rhs) {
+            return rhs.length() - lhs.length();
+            }
+        });
 
-    private class Cache {
-        String prevText = null;
-        int minTextSize;
-        int maxTextSize;
+        return words[0];
     }
 
     private class SizeTester {
-
         private final RectF textRect = new RectF();
 
-        public int testSize(int suggestedSize, RectF availableSpace) {
-            paint.setTextSize(suggestedSize);
+        public boolean testSize(String text, int size, boolean forceOneLine) {
+            paint.setTextSize(size);
 
-            String originalText = getText().toString();
-            String[] words = getWordsArray(originalText);
-
-            final String text = TextUtils.join(" ", words);
-
-            final boolean singleLine = getMaxLines() == 1;
-
-            if (singleLine) {
+            if (getMaxLines() == 1 || forceOneLine) {
                 textRect.bottom = paint.getFontSpacing();
                 textRect.right = paint.measureText(text);
 
             } else {
-                final StaticLayout layout = new StaticLayout(text, paint, maxWidth, Layout.Alignment.ALIGN_NORMAL, spacingMultiplier, spacingAdd, true);
+                StaticLayout sl = new StaticLayout(text, paint, maxWidth, Layout.Alignment.ALIGN_NORMAL, spacingMultiplier, spacingAdd, true);
 
-                // return early if we have more lines
-                if (getMaxLines() != NO_LINE_LIMIT && layout.getLineCount() > getMaxLines())
-                    return 1;
+                if (maxLines != NO_LINE_LIMIT && sl.getLineCount() > getMaxLines())
+                    return false;
 
-                textRect.bottom = layout.getHeight();
+                textRect.bottom = sl.getHeight();
+
                 int maxWidth = -1;
-                for (int i = 0; i < layout.getLineCount(); i++) {
-                    if (maxWidth < layout.getLineWidth(i))
-                        maxWidth = (int) layout.getLineWidth(i);
+                for (int i = 0; i < sl.getLineCount(); i++) {
+                    if (maxWidth < sl.getLineWidth(i))
+                        maxWidth = (int) sl.getLineWidth(i);
                 }
-
                 textRect.right = maxWidth;
             }
 
             textRect.offsetTo(0, 0);
 
-            // may be too small, don't worry we will find the best match
-            if (availableSpace.contains(textRect))
-                return -1;
-
-            // else, too big
-            return 1;
+            return availableSpaceRect.contains(textRect);
         }
-
-        private String[] getWordsArray(String text) {
-            String[] words = text.split("\\s+");
-            Arrays.sort(words, new Comparator<String>() {
-                @Override
-                public int compare(String lhs, String rhs) {
-                return rhs.length() - lhs.length();
-                }
-            });
-
-            return words;
-        }
-
-        private String getLongestWord(String text) {
-            return getWordsArray(text)[0];
-        }
-
     }
 }
