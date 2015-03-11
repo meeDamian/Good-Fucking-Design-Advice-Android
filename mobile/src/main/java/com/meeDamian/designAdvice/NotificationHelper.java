@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
@@ -17,14 +18,13 @@ public class NotificationHelper extends BroadcastReceiver {
     public static void la(@NonNull Context context) {
         Advice a = new MyDatabase(context).getNewAdvice();
 
-        String title = "Good Fucking Design Advice";
-
         NotificationCompat.Builder mBuilder =
             new NotificationCompat.Builder(context)
-                .setSmallIcon(R.drawable.ic_refresh_grey600_48dp)
+                .setSmallIcon(R.drawable.ic_launcher)
+                .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher))
                 .setContentText("#" + a.getId())
                 .setContentTitle(a.getBody())
-                .setSubText(title)
+                .setSubText(context.getString(R.string.app_name))
                 .setNumber(a.getIntegerId())
                 .setCategory(NotificationCompat.CATEGORY_RECOMMENDATION)
                 .setPriority(NotificationCompat.PRIORITY_MIN)

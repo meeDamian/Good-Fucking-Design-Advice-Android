@@ -10,20 +10,24 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
+import android.view.KeyCharacterMap;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.meeDamian.designAdvice.util.SystemUiHider;
 import com.meedamian.common.Advice;
 import com.meedamian.common.MyDatabase;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-public class AdviceActivity extends Activity implements ImageButton.OnClickListener {
+public class AdviceActivity extends Activity {
 
     private static final String CURSE_WORD_RAW      = "fucking";
     private static final String CURSE_WORD_CENSORED = "f******";
@@ -57,7 +61,12 @@ public class AdviceActivity extends Activity implements ImageButton.OnClickListe
         adviceId = (TextView) findViewById(R.id.adviceId);
 
 //        ImageButton nextAdvice = (ImageButton) findViewById(R.id.nextAdvice);
-//        nextAdvice.setOnClickListener(this);
+//        nextAdvice.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                setNewAdvice(null);
+//            }
+//        });
 
         ImageButton share = (ImageButton) findViewById(R.id.share);
         share.setOnClickListener(new View.OnClickListener() {
@@ -76,9 +85,13 @@ public class AdviceActivity extends Activity implements ImageButton.OnClickListe
 
         setNewAdvice(id);
 
-        NotificationHelper.la(this);
+//        NotificationHelper.la(this);
 
-        AlarmHelper.setAlarm(this, AlarmHelper.ALARM_HOUR);
+//        AlarmHelper.setAlarm(this, AlarmHelper.ALARM_HOUR);
+
+
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT && hasNavBar())
+            setupLegacyUiHider();
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -146,8 +159,70 @@ public class AdviceActivity extends Activity implements ImageButton.OnClickListe
         startActivity(Intent.createChooser(share, "Share Advice"));
     }
 
+
+    // OLD phones UI hider
+    private static final int AUTO_HIDE_DELAY_MILLIS = 3000;
+    private static final boolean TOGGLE_ON_CLICK = true;
+    private static final int HIDER_FLAGS = SystemUiHider.FLAG_HIDE_NAVIGATION;
+
+    private SystemUiHider mSystemUiHider;
+    Handler mHideHandler = new Handler();
+    Runnable mHideRunnable = new Runnable() {
+        @Override
+        public void run() {
+            mSystemUiHider.hide();
+        }
+    };
+
+
     @Override
-    public void onClick(View v) {
-        setNewAdvice(null);
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT && hasNavBar())
+            delayedHide(100);
+    }
+
+    private void delayedHide(int delayMillis) {
+        mHideHandler.removeCallbacks(mHideRunnable);
+        mHideHandler.postDelayed(mHideRunnable, delayMillis);
+    }
+
+    private void setupLegacyUiHider() {
+        // Set up an instance of SystemUiHider to control the system UI for
+        // this activity.
+        mSystemUiHider = SystemUiHider.getInstance(this, advice, HIDER_FLAGS);
+        mSystemUiHider.setup();
+        mSystemUiHider
+            .setOnVisibilityChangeListener(new SystemUiHider.OnVisibilityChangeListener() {
+
+                int mShortAnimTime;
+
+                @Override
+                public void onVisibilityChange(boolean visible) {
+                    if (mShortAnimTime == 0)
+                        mShortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+
+                    // Schedule a hide().
+                    if (visible) delayedHide(AUTO_HIDE_DELAY_MILLIS);
+                }
+            });
+
+        advice.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+            if (TOGGLE_ON_CLICK) {
+                mSystemUiHider.toggle();
+            } else {
+                mSystemUiHider.show();
+            }
+            }
+        });
+    }
+
+    private boolean hasNavBar() {
+        boolean hasBackKey = KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_BACK);
+        boolean hasHomeKey = KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_HOME);
+        return !(hasBackKey && hasHomeKey);
     }
 }
