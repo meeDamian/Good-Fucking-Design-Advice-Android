@@ -9,40 +9,27 @@ import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
+import android.util.Log;
 
 import com.meedamian.common.Advice;
 import com.meedamian.common.MyDatabase;
 
 public class NotificationHelper extends BroadcastReceiver {
 
-    public static void la(@NonNull Context context) {
+    public static void showSimpleNotification(@NonNull Context context) {
         Advice a = new MyDatabase(context).getNewAdvice();
 
         NotificationCompat.Builder mBuilder =
             new NotificationCompat.Builder(context)
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher))
-                .setContentText("#" + a.getId())
-                .setContentTitle(a.getBody())
-                .setSubText(context.getString(R.string.app_name))
-                .setNumber(a.getIntegerId())
-                .setCategory(NotificationCompat.CATEGORY_RECOMMENDATION)
-                .setPriority(NotificationCompat.PRIORITY_MIN)
-                .setShowWhen(false)
+                .setContentText(context.getString(R.string.app_name))
+                .setContentTitle(context.getString(R.string.notification_action))
+                .setCategory(NotificationCompat.CATEGORY_STATUS)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                .setStyle(new NotificationCompat.BigTextStyle()
-                    //.setBigContentTitle(a.getBody())
-                    .bigText(a.getBody()))
+                .setShowWhen(false)
                 .setAutoCancel(true);
-
-        Intent actionIntent = new Intent(context, NotificationHelper.class);
-        PendingIntent next = PendingIntent.getBroadcast(
-            context,
-            0,
-            actionIntent,
-            0
-        );
-        mBuilder.addAction(R.drawable.ic_refresh_grey600_48dp, "another", next);
 
 
         Intent clickIntent = new Intent(context, AdviceActivity.class);
@@ -54,10 +41,13 @@ public class NotificationHelper extends BroadcastReceiver {
         NotificationManagerCompat
             .from(context)
             .notify(0, mBuilder.build());
+
+
     }
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        la(context);
+        Log.d("lalala", "BOOM!");
+        showSimpleNotification(context);
     }
 }

@@ -44,13 +44,14 @@ public class AdviceActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             fixRecentsAppearance();
+        }
 
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-            .setDefaultFontPath("fonts/Roboto-Bold.ttf")
-            .setFontAttrId(R.attr.fontPath)
-            .build()
+                .setDefaultFontPath("fonts/Roboto-Bold.ttf")
+                .setFontAttrId(R.attr.fontPath)
+                .build()
         );
 
         setContentView(R.layout.activity_advice);
@@ -60,19 +61,16 @@ public class AdviceActivity extends Activity {
         advice = (TextView) findViewById(R.id.advice);
         adviceId = (TextView) findViewById(R.id.adviceId);
 
-//        ImageButton nextAdvice = (ImageButton) findViewById(R.id.nextAdvice);
-//        nextAdvice.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                setNewAdvice(null);
-//            }
-//        });
-
         ImageButton share = (ImageButton) findViewById(R.id.share);
         share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                shareThat();
+            Intent share = new Intent(Intent.ACTION_SEND);
+            share.setType("text/plain");
+//            share.putExtra(Intent.EXTRA_SUBJECT, a.getBody());
+//            share.putExtra(Intent.EXTRA_TITLE, a.getBody());
+            share.putExtra(Intent.EXTRA_TEXT, a.getBody() + "\n\n" + a.getUrl());
+            startActivity(Intent.createChooser(share, "Share Advice"));
             }
         });
 
@@ -81,14 +79,12 @@ public class AdviceActivity extends Activity {
             ? extras.getString("id")
             : null;
 
-        //id = "";
-
         setNewAdvice(id);
 
-//        NotificationHelper.la(this);
+        NotificationHelper.showSimpleNotification(this);
 
-//        AlarmHelper.setAlarm(this, AlarmHelper.ALARM_HOUR);
-
+        // After each start make sure alarm is set
+        AlarmHelper.setAlarm(this);
 
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT && hasNavBar())
             setupLegacyUiHider();
@@ -130,37 +126,29 @@ public class AdviceActivity extends Activity {
 
         adviceId.setText("#" + a.getId());
 
-        SpannableString aoe = new SpannableString(a.getBody());
+        SpannableString spannedString = new SpannableString(a.getBody());
         int red = Color.rgb(248, 68, 68);
 
         if (censored) {
             int curseStart = a.getBody().indexOf(CURSE_WORD_RAW);
             String censoredQuote = a.getBody().replace(CURSE_WORD_RAW, CURSE_WORD_CENSORED);
-            aoe = new SpannableString(censoredQuote);
-            aoe.setSpan(new ForegroundColorSpan(red), curseStart + 1, curseStart + CURSE_WORD_RAW.length(), 0);
+            spannedString = new SpannableString(censoredQuote);
+            spannedString.setSpan(new ForegroundColorSpan(red), curseStart + 1, curseStart + CURSE_WORD_RAW.length(), 0);
         }
 
         // color dot red (last char)
-        aoe.setSpan(new ForegroundColorSpan(red), aoe.length()-1, aoe.length(), 0);
+        spannedString.setSpan(new ForegroundColorSpan(red), spannedString.length()-1, spannedString.length(), 0);
 
-        // NOTE uncomment once line height fix is found
+        // NOTE uncomment once line-height fix is found
         // increase dot size
         //aoe.setSpan(new RelativeSizeSpan(1.5f), aoe.length()-1, aoe.length(), 0);
 
-        advice.setText(aoe);
-    }
-
-    private void shareThat() {
-        Intent share = new Intent(Intent.ACTION_SEND);
-        share.setType("text/plain");
-//        share.putExtra(Intent.EXTRA_SUBJECT, a.getBody());
-//        share.putExtra(Intent.EXTRA_TITLE, a.getBody());
-        share.putExtra(Intent.EXTRA_TEXT, a.getBody() + "\n\n" + a.getUrl());
-        startActivity(Intent.createChooser(share, "Share Advice"));
+        advice.setText(spannedString);
     }
 
 
-    // OLD phones UI hider
+
+    // old AND softkey phones UI hider
     private static final int AUTO_HIDE_DELAY_MILLIS = 3000;
     private static final boolean TOGGLE_ON_CLICK = true;
     private static final int HIDER_FLAGS = SystemUiHider.FLAG_HIDE_NAVIGATION;

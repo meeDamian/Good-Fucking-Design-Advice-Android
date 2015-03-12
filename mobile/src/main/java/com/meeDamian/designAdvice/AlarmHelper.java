@@ -15,15 +15,14 @@ public class AlarmHelper extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-
         switch(intent.getAction()) {
             case Intent.ACTION_BOOT_COMPLETED:
-                setAlarm(context, ALARM_HOUR);
+                setAlarm(context);
                 break;
         }
     }
 
-    public static void setAlarm(Context context, int hour) {
+    private static void setAlarm(Context context, int hour) {
         Intent intent = new Intent(context, NotificationHelper.class);
 
         PendingIntent prevAlarm = PendingIntent.getBroadcast(
@@ -33,6 +32,7 @@ public class AlarmHelper extends BroadcastReceiver {
             PendingIntent.FLAG_NO_CREATE
         );
 
+        // only if no alarm is set yet
         if(prevAlarm == null) {
             PendingIntent alarmIntent = PendingIntent.getBroadcast(
                 context,
@@ -44,7 +44,7 @@ public class AlarmHelper extends BroadcastReceiver {
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis(System.currentTimeMillis());
             calendar.add(Calendar.DATE, ALARM_DAYS);
-            calendar.set(Calendar.HOUR_OF_DAY, hour);
+            calendar.set(Calendar.HOUR_OF_DAY, ALARM_HOUR);
 
             AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
@@ -55,5 +55,9 @@ public class AlarmHelper extends BroadcastReceiver {
                 alarmIntent
             );
         }
+    }
+
+    public static void setAlarm(Context context) {
+        setAlarm(context, ALARM_HOUR);
     }
 }

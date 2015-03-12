@@ -21,6 +21,15 @@ public class MyDatabase extends SQLiteAssetHelper {
         db = getWritableDatabase();
     }
 
+    private Cursor getTodaysCursor() {
+        return db.query(
+            "advices",
+            null,
+            "id = ?",
+            new String[]{ String.valueOf(1) },
+            null, null, null, null);
+    }
+
     private Cursor getCursor() {
         return db.rawQuery("SELECT * " +
                 "FROM advices " +
@@ -35,10 +44,8 @@ public class MyDatabase extends SQLiteAssetHelper {
         return db.query(
             "advices",
             null,
-            "id=?",
-            new String[] {
-                adviceId
-            },
+            " id = ? ",
+            new String[] { adviceId },
             null,
             null,
             null
@@ -48,7 +55,11 @@ public class MyDatabase extends SQLiteAssetHelper {
     private Advice getNewAdvice(Cursor c) {
         c.moveToFirst();
 
-        Advice a = new Advice(c);
+        Advice a = new Advice(
+            c.getInt(c.getColumnIndex(Advice.ID)),
+            c.getString(c.getColumnIndex(Advice.BODY)),
+            c.getInt(c.getColumnIndex(Advice.SHOWN_COUNT))
+        );
 
         ContentValues updatedCount = new ContentValues();
         updatedCount.put(Advice.SHOWN_COUNT, a.incShownCount());
@@ -65,7 +76,7 @@ public class MyDatabase extends SQLiteAssetHelper {
     }
 
     public Advice getNewAdvice() {
-        return getNewAdvice(getCursor());
+        return getNewAdvice(getTodaysCursor());
     }
 
     public Advice getNewAdvice(@NonNull String adviceId) {
