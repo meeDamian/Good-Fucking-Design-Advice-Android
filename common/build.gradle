@@ -20,4 +20,5 @@ android {
 dependencies {
     compile 'com.readystatesoftware.sqliteasset:sqliteassethelper:2.0.1'
     compile 'com.android.support:support-annotations:21.0.3'
+    compile 'joda-time:joda-time:2.7'
 }

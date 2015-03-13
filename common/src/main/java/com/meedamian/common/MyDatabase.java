@@ -8,6 +8,10 @@ import android.support.annotation.NonNull;
 
 import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
 
+import org.joda.time.DateTime;
+import org.joda.time.Days;
+import org.joda.time.MutableDateTime;
+
 public class MyDatabase extends SQLiteAssetHelper {
 
     private SQLiteDatabase db;
@@ -22,29 +26,19 @@ public class MyDatabase extends SQLiteAssetHelper {
     }
 
     private Cursor getTodaysCursor() {
-        return db.query(
-            "advices",
-            null,
-            "id = ?",
-            new String[]{ String.valueOf(102) },
-            null, null, null, null);
-    }
+        MutableDateTime epoch = new MutableDateTime();
+        epoch.setDate(0);
 
-    private Cursor getCursor() {
-        return db.rawQuery("SELECT * " +
-                "FROM advices " +
-                "WHERE shown=(SELECT MIN(shown) FROM advices) " +
-                "ORDER BY RANDOM() " +
-                "LIMIT 1",
-            null
-        );
+        Days days = Days.daysBetween(epoch, new DateTime());
+
+        return getCursor(String.valueOf((days.getDays()%224) + 1));
     }
 
     private Cursor getCursor(String adviceId) {
         return db.query(
             "advices",
             null,
-            " id = ? ",
+            " semiRandId = ? ",
             new String[] { adviceId },
             null,
             null,
