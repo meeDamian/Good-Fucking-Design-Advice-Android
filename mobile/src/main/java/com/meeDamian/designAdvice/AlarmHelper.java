@@ -25,36 +25,28 @@ public class AlarmHelper extends BroadcastReceiver {
     private static void setAlarm(Context context, int hour) {
         Intent intent = new Intent(context, NotificationHelper.class);
 
-        PendingIntent prevAlarm = PendingIntent.getBroadcast(
+        PendingIntent alarmIntent = PendingIntent.getBroadcast(
             context,
             0,
             intent,
-            PendingIntent.FLAG_NO_CREATE
+            PendingIntent.FLAG_UPDATE_CURRENT
         );
 
-        // only if no alarm is set yet
-        if(prevAlarm == null) {
-            PendingIntent alarmIntent = PendingIntent.getBroadcast(
-                context,
-                0,
-                intent,
-                PendingIntent.FLAG_UPDATE_CURRENT
-            );
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.add(Calendar.DATE, ALARM_DAYS);
+        calendar.set(Calendar.HOUR_OF_DAY, hour);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
 
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTimeInMillis(System.currentTimeMillis());
-            calendar.add(Calendar.DATE, ALARM_DAYS);
-            calendar.set(Calendar.HOUR_OF_DAY, ALARM_HOUR);
+        AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
-            AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-
-            alarmMgr.setInexactRepeating(
-                AlarmManager.RTC_WAKEUP,
-                calendar.getTimeInMillis(),
-                AlarmManager.INTERVAL_DAY,
-                alarmIntent
-            );
-        }
+        alarmMgr.setInexactRepeating(
+            AlarmManager.RTC_WAKEUP,
+            calendar.getTimeInMillis(),
+            AlarmManager.INTERVAL_DAY,
+            alarmIntent
+        );
     }
 
     public static void setAlarm(Context context) {

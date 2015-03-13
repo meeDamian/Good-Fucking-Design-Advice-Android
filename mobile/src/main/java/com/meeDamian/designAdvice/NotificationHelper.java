@@ -9,14 +9,13 @@ import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
-import android.util.Log;
 
 import com.meedamian.common.Advice;
 import com.meedamian.common.MyDatabase;
 
 public class NotificationHelper extends BroadcastReceiver {
 
-    public static void showSimpleNotification(@NonNull Context context) {
+    public static void showNotification(@NonNull Context context) {
         Advice a = new MyDatabase(context).getNewAdvice();
 
         NotificationCompat.Builder mBuilder =
@@ -41,13 +40,10 @@ public class NotificationHelper extends BroadcastReceiver {
         NotificationManagerCompat
             .from(context)
             .notify(0, mBuilder.build());
-
-
     }
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.d("lalala", "BOOM!");
-        showSimpleNotification(context);
+        showNotification(context);
     }
 }

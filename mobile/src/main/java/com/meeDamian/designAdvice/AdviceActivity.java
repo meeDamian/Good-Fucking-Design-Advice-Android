@@ -81,8 +81,6 @@ public class AdviceActivity extends Activity {
 
         setNewAdvice(id);
 
-        NotificationHelper.showSimpleNotification(this);
-
         // After each start make sure alarm is set
         AlarmHelper.setAlarm(this);
 
