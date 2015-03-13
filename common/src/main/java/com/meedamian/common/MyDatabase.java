@@ -26,7 +26,7 @@ public class MyDatabase extends SQLiteAssetHelper {
             "advices",
             null,
             "id = ?",
-            new String[]{ String.valueOf(1) },
+            new String[]{ String.valueOf(102) },
             null, null, null, null);
     }
 

@@ -3,10 +3,12 @@ DROP TABLE IF EXISTS advices;
 CREATE TABLE advices (
   id numeric PRIMARY KEY,
   advice text,
+  semiRandId numeric,
   shown numeric DEFAULT 0
 );
 
-INSERT INTO advices ('id', 'advice') VALUES
+INSERT INTO advices ('id', 'advice', 'semiRandId') VALUES
+-- START_QUOTES
 (1, 'Add some fucking contrast.'),
 (2, 'Have a clear fucking hierarchy.'),
 (3, 'Use fucking Helvetica.'),
@@ -231,3 +233,4 @@ INSERT INTO advices ('id', 'advice') VALUES
 (222, 'Set your sights fucking higher.'),
 (223, 'Make your own fucking rules.'),
 (224, 'There is no fucking limit to creativity.');
+-- END_QUOTES
