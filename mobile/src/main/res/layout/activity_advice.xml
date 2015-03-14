@@ -14,7 +14,7 @@
         tools:ignore="MissingPrefix"
         fontPath="fonts/Roboto-Bold.ttf"
         android:textStyle="bold"
-        android:textSize="90sp"
+        android:textSize="300sp"
         android:textColor="@android:color/black"
 
         android:gravity="center_vertical"
