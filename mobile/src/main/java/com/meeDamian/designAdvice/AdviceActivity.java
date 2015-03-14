@@ -49,9 +49,9 @@ public class AdviceActivity extends Activity {
         }
 
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                .setDefaultFontPath("fonts/Roboto-Bold.ttf")
-                .setFontAttrId(R.attr.fontPath)
-                .build()
+            .setDefaultFontPath("fonts/Roboto-Bold.ttf")
+            .setFontAttrId(R.attr.fontPath)
+            .build()
         );
 
         setContentView(R.layout.activity_advice);
@@ -67,8 +67,6 @@ public class AdviceActivity extends Activity {
             public void onClick(View v) {
             Intent share = new Intent(Intent.ACTION_SEND);
             share.setType("text/plain");
-//            share.putExtra(Intent.EXTRA_SUBJECT, a.getBody());
-//            share.putExtra(Intent.EXTRA_TITLE, a.getBody());
             share.putExtra(Intent.EXTRA_TEXT, a.getBody() + "\n\n" + a.getUrl());
             startActivity(Intent.createChooser(share, "Share Advice"));
             }

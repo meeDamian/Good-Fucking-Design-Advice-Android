@@ -60,8 +60,6 @@
 
               tools:text="#7" />
 
-
-
     <!--<ImageButton android:id="@+id/nextAdvice"-->
     <!--android:layout_width="wrap_content"-->
     <!--android:layout_height="wrap_content"-->
