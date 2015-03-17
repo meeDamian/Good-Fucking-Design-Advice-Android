@@ -20,6 +20,9 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.meeDamian.designAdvice.util.SystemUiHider;
 import com.meedamian.common.Advice;
 import com.meedamian.common.MyDatabase;
@@ -32,9 +35,12 @@ public class AdviceActivity extends Activity {
     private static final String CURSE_WORD_RAW      = "fucking";
     private static final String CURSE_WORD_CENSORED = "f******";
 
+    private GoogleAnalytics analytics;
+    private Tracker t;
+
     private MyDatabase db;
     private TextView advice;
-    private TextView adviceId;
+//    private TextView adviceId;
 
     private Advice a;
 
@@ -44,9 +50,8 @@ public class AdviceActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            fixRecentsAppearance();
-        }
+        analytics = GoogleAnalytics.getInstance(this);
+        t = analytics.newTracker(R.xml.global_tracker);
 
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
             .setDefaultFontPath("fonts/Roboto-Bold.ttf")
@@ -59,7 +64,7 @@ public class AdviceActivity extends Activity {
         db = new MyDatabase(this);
 
         advice = (TextView) findViewById(R.id.advice);
-        adviceId = (TextView) findViewById(R.id.adviceId);
+//        adviceId = (TextView) findViewById(R.id.adviceId);
 
         ImageButton share = (ImageButton) findViewById(R.id.share);
         share.setOnClickListener(new View.OnClickListener() {
@@ -68,7 +73,7 @@ public class AdviceActivity extends Activity {
             Intent share = new Intent(Intent.ACTION_SEND);
             share.setType("text/plain");
             share.putExtra(Intent.EXTRA_TEXT, a.getBody() + "\n\n" + a.getUrl());
-            startActivity(Intent.createChooser(share, "Share Advice"));
+            startActivity(Intent.createChooser(share, "Share Advice #" + a.getId()));
             }
         });
 
@@ -79,6 +84,8 @@ public class AdviceActivity extends Activity {
 
         setNewAdvice(id);
 
+//        NotificationHelper.showNotification(this);
+
         // After each start make sure alarm is set
         AlarmHelper.setAlarm(this);
 
@@ -87,10 +94,10 @@ public class AdviceActivity extends Activity {
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private void fixRecentsAppearance() {
+    private void fixRecentsAppearance(String id) {
         Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
         String name = getString(R.string.app_name);
-        setTaskDescription(new ActivityManager.TaskDescription(name, icon, Color.WHITE));
+        setTaskDescription(new ActivityManager.TaskDescription(name + " #" + id, icon, Color.WHITE));
     }
 
     @Override
@@ -120,7 +127,12 @@ public class AdviceActivity extends Activity {
             ? db.getNewAdvice(id)
             : db.getNewAdvice();
 
-        adviceId.setText("#" + a.getId());
+        t.setScreenName("Advice #" + a.getId());
+        t.send(new HitBuilders.ScreenViewBuilder().build());
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            fixRecentsAppearance(a.getId());
+        }
 
         SpannableString spannedString = new SpannableString(a.getBody());
         int red = Color.rgb(248, 68, 68);

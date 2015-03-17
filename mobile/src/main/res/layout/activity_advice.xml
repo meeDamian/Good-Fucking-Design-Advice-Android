@@ -29,6 +29,7 @@
                  android:src="@drawable/ic_share_grey600_36dp"
 
                  android:layout_margin="16dp"
+                 android:alpha="0.4"
 
                  android:clickable="true"
 
@@ -40,25 +41,25 @@
 
                  android:contentDescription="@string/share_advice" />
 
-    <TextView android:id="@+id/adviceId"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:gravity="center_vertical"
+    <!--<TextView android:id="@+id/adviceId"-->
+              <!--android:layout_width="wrap_content"-->
+              <!--android:layout_height="wrap_content"-->
+              <!--android:gravity="center_vertical"-->
 
-              android:layout_margin="16dp"
-              android:layout_toLeftOf="@id/share"
-              android:layout_toStartOf="@id/share"
-              android:textSize="30sp"
-              android:height="36dp"
-              android:includeFontPadding="false"
+              <!--android:layout_margin="16dp"-->
+              <!--android:layout_toLeftOf="@id/share"-->
+              <!--android:layout_toStartOf="@id/share"-->
+              <!--android:textSize="30sp"-->
+              <!--android:height="36dp"-->
+              <!--android:includeFontPadding="false"-->
 
-              android:layout_alignBaseline="@id/share"
+              <!--android:layout_alignBaseline="@id/share"-->
 
-              android:layout_alignParentTop="true"
-              android:layout_alignParentLeft="true"
-              android:layout_alignParentStart="true"
+              <!--android:layout_alignParentTop="true"-->
+              <!--android:layout_alignParentLeft="true"-->
+              <!--android:layout_alignParentStart="true"-->
 
-              tools:text="#7" />
+              <!--tools:text="#7" />-->
 
     <!--<ImageButton android:id="@+id/nextAdvice"-->
     <!--android:layout_width="wrap_content"-->
