@@ -77,13 +77,6 @@ public class AdviceActivity extends Activity {
             }
         });
 
-        Bundle extras = getIntent().getExtras();
-        String id = extras != null
-            ? extras.getString("id")
-            : null;
-
-        setNewAdvice(id);
-
 //        NotificationHelper.showNotification(this);
 
         // After each start make sure alarm is set
@@ -107,6 +100,14 @@ public class AdviceActivity extends Activity {
 
     @Override
     protected void onResume() {
+
+        Bundle extras = getIntent().getExtras();
+        String id = extras != null
+            ? extras.getString("id")
+            : null;
+
+        setNewAdvice(id);
+
         int visibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
             | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
             | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
