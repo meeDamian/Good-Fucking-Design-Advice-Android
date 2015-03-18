@@ -8,8 +8,8 @@ android {
         applicationId "com.meeDamian.designAdvice"
         minSdkVersion 15
         targetSdkVersion 22
-        versionCode 13
-        versionName "1.5.4"
+        versionCode 14
+        versionName "1.6"
     }
 
     compileOptions {

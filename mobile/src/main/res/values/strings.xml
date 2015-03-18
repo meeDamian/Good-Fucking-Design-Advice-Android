@@ -9,4 +9,6 @@
 
     <string name="notification_action">Grab your fucking advice for today</string>
 
+    <string name="censorship_notice">Tap the ugly word to censor it</string>
+
 </resources>

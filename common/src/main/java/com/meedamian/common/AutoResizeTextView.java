@@ -37,6 +37,8 @@ public class AutoResizeTextView extends TextView {
     private boolean initiated = false;
     private TextPaint paint;
 
+    private boolean autoResizeEnabled = true;
+
 
     public AutoResizeTextView(final Context context) {
         this(context, null, 0);
@@ -139,7 +141,7 @@ public class AutoResizeTextView extends TextView {
     }
 
     private void adjustTextSize() {
-        if (!initiated)
+        if (!initiated || !autoResizeEnabled)
             return;
 
         final int startSize = (int) minTextSize;
@@ -212,6 +214,10 @@ public class AutoResizeTextView extends TextView {
         });
 
         return words[0];
+    }
+
+    public void setAutoResize(boolean enable) {
+        this.autoResizeEnabled = enable;
     }
 
     private class SizeTester {
