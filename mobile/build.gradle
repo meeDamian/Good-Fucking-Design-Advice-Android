@@ -6,10 +6,10 @@ android {
 
     defaultConfig {
         applicationId "com.meeDamian.designAdvice"
-        minSdkVersion 16
+        minSdkVersion 15
         targetSdkVersion 22
-        versionCode 12
-        versionName "1.5.3"
+        versionCode 13
+        versionName "1.5.4"
     }
 
     compileOptions {
