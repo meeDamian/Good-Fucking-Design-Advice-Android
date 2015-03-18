@@ -8,12 +8,15 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Rect;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
+import android.util.DisplayMetrics;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
 import android.view.View;
@@ -27,6 +30,10 @@ import com.meeDamian.designAdvice.util.SystemUiHider;
 import com.meedamian.common.Advice;
 import com.meedamian.common.MyDatabase;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
@@ -35,11 +42,11 @@ public class AdviceActivity extends Activity {
     private static final String CURSE_WORD_RAW      = "fucking";
     private static final String CURSE_WORD_CENSORED = "f******";
 
-    private GoogleAnalytics analytics;
     private Tracker t;
 
     private MyDatabase db;
     private TextView advice;
+    private ImageButton share;
 //    private TextView adviceId;
 
     private Advice a;
@@ -50,7 +57,7 @@ public class AdviceActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        analytics = GoogleAnalytics.getInstance(this);
+        GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);
         t = analytics.newTracker(R.xml.global_tracker);
 
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
@@ -66,12 +73,16 @@ public class AdviceActivity extends Activity {
         advice = (TextView) findViewById(R.id.advice);
 //        adviceId = (TextView) findViewById(R.id.adviceId);
 
-        ImageButton share = (ImageButton) findViewById(R.id.share);
+        share = (ImageButton) findViewById(R.id.share);
         share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+            savePic(takeScreenShot(), "shot.png");
+
             Intent share = new Intent(Intent.ACTION_SEND);
-            share.setType("text/plain");
+            share.putExtra(Intent.EXTRA_STREAM, Uri.parse("content://com.meeDamian.designAdvice.fileprovider/screen/shot.png"));
+            share.setType("image/png");
             share.putExtra(Intent.EXTRA_TEXT, a.getBody() + "\n\n" + a.getUrl());
             startActivity(Intent.createChooser(share, "Share Advice #" + a.getId()));
             }
@@ -153,6 +164,43 @@ public class AdviceActivity extends Activity {
         //aoe.setSpan(new RelativeSizeSpan(1.5f), aoe.length()-1, aoe.length(), 0);
 
         advice.setText(spannedString);
+    }
+
+    private Bitmap takeScreenShot() {
+        View view = getWindow().getDecorView();
+
+        share.setVisibility(View.GONE);
+        view.setDrawingCacheEnabled(true);
+        view.buildDrawingCache();
+
+        Bitmap b1 = view.getDrawingCache();
+        Rect frame = new Rect();
+        getWindow().getDecorView().getWindowVisibleDisplayFrame(frame);
+
+        int statusBarHeight = frame.top;
+
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int width = displayMetrics.widthPixels;
+        int height = displayMetrics.heightPixels;
+
+        Bitmap b = Bitmap.createBitmap(b1, 0, statusBarHeight, width, height - statusBarHeight);
+        view.destroyDrawingCache();
+        share.setVisibility(View.VISIBLE);
+        return b;
+    }
+    private void savePic(Bitmap b, String fileName) {
+        FileOutputStream fos;
+        try {
+            File f = new File(getCacheDir(), fileName);
+            fos = new FileOutputStream(f);
+            b.compress(Bitmap.CompressFormat.PNG, 90, fos);
+            fos.flush();
+            fos.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
