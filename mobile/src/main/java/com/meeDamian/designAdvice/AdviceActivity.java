@@ -78,17 +78,17 @@ public class AdviceActivity extends Activity {
             @Override
             public void onClick(View v) {
 
-            savePic(takeScreenShot(), "shot.png");
+            String fileName = "GFDA_" + a.getId() + ".png";
+
+            savePic(takeScreenShot(), fileName);
 
             Intent share = new Intent(Intent.ACTION_SEND);
-            share.putExtra(Intent.EXTRA_STREAM, Uri.parse("content://com.meeDamian.designAdvice.fileprovider/screen/shot.png"));
+            share.putExtra(Intent.EXTRA_STREAM, Uri.parse("content://com.meeDamian.designAdvice.fileprovider/screen/" + fileName));
             share.setType("image/png");
             share.putExtra(Intent.EXTRA_TEXT, a.getBody() + "\n\n" + a.getUrl());
             startActivity(Intent.createChooser(share, "Share Advice #" + a.getId()));
             }
         });
-
-//        NotificationHelper.showNotification(this);
 
         // After each start make sure alarm is set
         AlarmHelper.setAlarm(this);
