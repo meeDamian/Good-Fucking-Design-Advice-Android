@@ -10,8 +10,8 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 
-import com.meedamian.common.Advice;
-import com.meedamian.common.MyDatabase;
+import com.meeDamian.common.Advice;
+import com.meeDamian.common.MyDatabase;
 
 public class NotificationHelper extends BroadcastReceiver {
 

@@ -1,4 +1,4 @@
-package com.meedamian.common;
+package com.meeDamian.common;
 
 import android.content.ContentValues;
 import android.content.Context;

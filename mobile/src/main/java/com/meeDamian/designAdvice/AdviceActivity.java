@@ -33,10 +33,10 @@ import android.widget.Toast;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
+import com.meeDamian.common.Advice;
+import com.meeDamian.common.MyDatabase;
 import com.meeDamian.designAdvice.util.SystemUiHider;
-import com.meedamian.common.Advice;
-import com.meedamian.common.AutoResizeTextView;
-import com.meedamian.common.MyDatabase;
+import com.meeDamian.lib.AutoResizeTextView;
 
 import java.io.File;
 import java.io.FileOutputStream;

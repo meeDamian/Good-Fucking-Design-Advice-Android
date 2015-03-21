@@ -1,4 +1,4 @@
-package com.meedamian.common;
+package com.meeDamian.common;
 
 public class Advice {
     public static final String ID = "id";

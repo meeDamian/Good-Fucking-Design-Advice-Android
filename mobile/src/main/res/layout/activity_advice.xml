@@ -4,7 +4,7 @@
                 android:layout_height="match_parent"
                 tools:context=".AdviceActivity">
 
-    <com.meedamian.common.AutoResizeTextView
+    <com.meeDamian.lib.AutoResizeTextView
         android:id="@+id/advice"
 
         android:layout_width="match_parent"

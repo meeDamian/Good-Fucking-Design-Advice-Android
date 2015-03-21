@@ -1,5 +1,9 @@
 apply plugin: 'com.android.application'
 
+def String safeGet(String name, String defaultValue = '') {
+    return hasProperty(name) ? project[name] : defaultValue
+}
+
 android {
     compileSdkVersion 22
     buildToolsVersion "22"
@@ -19,10 +23,10 @@ android {
 
     signingConfigs {
         release {
-            storeFile file(project.STORE_FILE)
-            storePassword project.STORE_PASSWORD as String
-            keyAlias project.KEY_ALIAS as String
-            keyPassword project.KEY_PASSWORD as String
+            storeFile file(safeGet('STORE_FILE'))
+            storePassword safeGet('STORE_PASSWORD')
+            keyAlias safeGet('KEY_ALIAS')
+            keyPassword safeGet('KEY_PASSWORD')
         }
     }
 
@@ -36,19 +40,22 @@ android {
             android.applicationVariants.all { variant ->
                 variant.outputs.each { output ->
                     if (output.name == "release") {
-                        def file = output.outputFile
-                        String parent = file.parent
+                        String fileName = [
+                            defaultConfig.applicationId,
+                            project.name,
+                            defaultConfig.versionName,
+                            defaultConfig.versionCode
+                         ].join('-') + '.apk'
 
-                        if (project.hasProperty('OUTPUT_DIR') && new File(project.OUTPUT_DIR as String).exists())
-                            parent = project.OUTPUT_DIR
-
-                        output.outputFile = new File(
-                            parent,
-                            file.name.replace(
-                                ".apk",
-                                "-" + (defaultConfig.versionName as String) + "-build" + (defaultConfig.versionCode as String) + ".apk"
-                            ) as String
+                        File dir = new File(
+                            safeGet('RELEASES_PARENT_DIR', '~/APKs'),
+                            safeGet('FOLDER_NAME', project.group as String)
                         )
+
+                        if (!dir.exists())
+                            dir.mkdirs()
+
+                        output.outputFile = new File(dir, fileName)
                     }
                 }
             }
@@ -57,8 +64,7 @@ android {
 }
 
 dependencies {
-//    provided 'com.squareup.dagger:dagger-compiler:1.2.1'
-
+    //    provided 'com.squareup.dagger:dagger-compiler:1.2.1'
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(':common')
     wearApp project(':wear')
@@ -69,4 +75,5 @@ dependencies {
     compile 'com.android.support:support-v4:22.0.0'
     compile 'com.android.support:support-annotations:21.0.3'
     compile 'uk.co.chrisjenx:calligraphy:2.0.0'
+    compile project(':..:AutoResizeTextView:libAutoResizeTextView')
 }
