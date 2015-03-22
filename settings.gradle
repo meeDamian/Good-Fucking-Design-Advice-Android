@@ -1,1 +1,4 @@
-include ':mobile', ':wear', ':common', '..:AutoResizeTextView:libAutoResizeTextView'
+include ':mobile', ':wear', ':common'
+
+include ':libAutoResizeTextView'
+project(':libAutoResizeTextView').projectDir = new File(settingsDir, '../AutoResizeTextView/libAutoResizeTextView')

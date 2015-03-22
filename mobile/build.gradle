@@ -26,7 +26,7 @@ android {
             storeFile file(safeGet('STORE_FILE'))
             storePassword safeGet('STORE_PASSWORD')
             keyAlias safeGet('KEY_ALIAS')
-            keyPassword safeGet('KEY_PASSWORD')
+            keyPassword safeGet('KEY_PASSWORD', safeGet('STORE_PASSWORD'))
         }
     }
 
@@ -52,8 +52,7 @@ android {
                             safeGet('FOLDER_NAME', project.group as String)
                         )
 
-                        if (!dir.exists())
-                            dir.mkdirs()
+                        if (!dir.exists()) dir.mkdirs()
 
                         output.outputFile = new File(dir, fileName)
                     }
@@ -75,5 +74,5 @@ dependencies {
     compile 'com.android.support:support-v4:22.0.0'
     compile 'com.android.support:support-annotations:21.0.3'
     compile 'uk.co.chrisjenx:calligraphy:2.0.0'
-    compile project(':..:AutoResizeTextView:libAutoResizeTextView')
+    compile project(':libAutoResizeTextView')
 }

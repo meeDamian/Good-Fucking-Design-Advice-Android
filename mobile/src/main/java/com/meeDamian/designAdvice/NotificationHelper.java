@@ -1,6 +1,5 @@
 package com.meeDamian.designAdvice;
 
-
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
