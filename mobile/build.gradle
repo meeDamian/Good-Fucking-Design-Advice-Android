@@ -12,8 +12,8 @@ android {
         applicationId "com.meeDamian.designAdvice"
         minSdkVersion 15
         targetSdkVersion 22
-        versionCode 14
-        versionName "1.6"
+        versionCode 15
+        versionName "1.6.1"
     }
 
     compileOptions {

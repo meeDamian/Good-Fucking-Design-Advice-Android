@@ -9,14 +9,9 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 
-import com.meeDamian.common.Advice;
-import com.meeDamian.common.MyDatabase;
-
 public class NotificationHelper extends BroadcastReceiver {
 
     public static void showNotification(@NonNull Context context) {
-        Advice a = new MyDatabase(context).getNewAdvice();
-
         NotificationCompat.Builder mBuilder =
             new NotificationCompat.Builder(context)
                 .setSmallIcon(R.drawable.ic_launcher)
@@ -31,7 +26,6 @@ public class NotificationHelper extends BroadcastReceiver {
 
 
         Intent clickIntent = new Intent(context, AdviceActivity.class);
-        clickIntent.putExtra("id", a.getId());
 
         PendingIntent pi = PendingIntent.getActivity(context, 0, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.setContentIntent(pi);
