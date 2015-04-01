@@ -24,7 +24,6 @@ public class NotificationHelper extends BroadcastReceiver {
                 .setShowWhen(false)
                 .setAutoCancel(true);
 
-
         Intent clickIntent = new Intent(context, AdviceActivity.class);
 
         PendingIntent pi = PendingIntent.getActivity(context, 0, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);

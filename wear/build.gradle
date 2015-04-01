@@ -1,15 +1,25 @@
 apply plugin: 'com.android.application'
 
+// read secret variables
+// IMPORTANT: must be above `android {}` declaration
+File secretPropsFile = file('../secret.properties')
+if (secretPropsFile.exists()) {
+    Properties p = new Properties()
+    p.load(new FileInputStream(secretPropsFile))
+    p.each { name, value ->
+        safeLoad name as String, value
+    }
+}
 
 android {
     compileSdkVersion 22
-    buildToolsVersion "22"
+    buildToolsVersion "22.0.1"
 
     defaultConfig {
         applicationId "com.meeDamian.designAdvice"
         minSdkVersion 21
         targetSdkVersion 22
-        versionCode 1
+        versionCode getBuildVersion(defaultValue: 18)
         versionName "1.0"
     }
 
@@ -20,10 +30,10 @@ android {
 
     signingConfigs {
         release {
-            storeFile file(project.STORE_FILE)
-            storePassword project.STORE_PASSWORD as String
-            keyAlias project.KEY_ALIAS as String
-            keyPassword project.KEY_PASSWORD as String
+            storeFile file(safeGet('STORE_FILE'))
+            storePassword safeGet('STORE_PASSWORD')
+            keyAlias safeGet('KEY_ALIAS')
+            keyPassword safeGet('KEY_PASSWORD', safeGet('STORE_PASSWORD'))
         }
     }
 
@@ -33,26 +43,6 @@ android {
             signingConfig signingConfigs.release as Object
             minifyEnabled true
             zipAlignEnabled true
-
-            android.applicationVariants.all { variant ->
-                variant.outputs.each { output ->
-                    if (output.name == "release") {
-                        def file = output.outputFile
-                        String parent = file.parent
-
-                        if (project.hasProperty('OUTPUT_DIR') && new File(project.OUTPUT_DIR as String).exists())
-                            parent = project.OUTPUT_DIR
-
-                        output.outputFile = new File(
-                            parent,
-                            file.name.replace(
-                                ".apk",
-                                "-" + (defaultConfig.versionName as String) + "-build" + (defaultConfig.versionCode as String) + ".apk"
-                            ) as String
-                        )
-                    }
-                }
-            }
         }
     }
 }
@@ -60,7 +50,36 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.google.android.support:wearable:1.1.0'
-    compile 'com.google.android.gms:play-services-wearable:6.5.87'
-    compile 'com.android.support:support-annotations:21.0.3'
+    compile 'com.google.android.gms:play-services-wearable:7.0.0'
+    compile 'com.android.support:support-annotations:22.0.0'
     compile project(':common')
+}
+
+
+// get variables && prevent crashing if missing
+String safeGet(String name, String defaultValue = '') {
+    hasProperty(name) ? project[name] : defaultValue
+}
+
+// loads variables from a file to `project` so they can be `safeGet`-ed later
+def safeLoad(String name, Object value, Boolean override = false) {
+    if (!hasProperty(name) || override)
+        project.set name, value
+}
+
+Integer getBuildVersion(defaultVersion) {
+    File verFile = file('../version.properties')
+
+    if (!verFile.canRead())
+        verFile.createNewFile()
+
+    Properties props = new Properties()
+
+    props.load new FileInputStream(verFile)
+    String currentCodeVersion = props['VERSION_CODE']
+
+    if (currentCodeVersion == null)
+        currentCodeVersion = defaultVersion ?: android.defaultConfig.versionCode
+
+    currentCodeVersion as Integer
 }
