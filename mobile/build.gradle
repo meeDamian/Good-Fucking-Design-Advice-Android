@@ -3,7 +3,7 @@ apply plugin: 'play'
 
 play {
     serviceAccountEmail = safeGet('PLAY_EMAIL')
-    pk12File = file(safeGet('PLAY_KEY'))
+    pk12File = safeGetFile('PLAY_KEY')
 }
 
 // read secret variables
@@ -36,7 +36,7 @@ android {
 
     signingConfigs {
         release {
-            storeFile file(safeGet('STORE_FILE'))
+            storeFile safeGetFile('STORE_FILE')
             storePassword safeGet('STORE_PASSWORD')
             keyAlias safeGet('KEY_ALIAS')
             keyPassword safeGet('KEY_PASSWORD', safeGet('STORE_PASSWORD'))
@@ -115,6 +115,10 @@ dependencies {
 // get variables && prevent crashing if missing
 String safeGet(String name, String defaultValue = '') {
     hasProperty(name) ? project[name] : defaultValue
+}
+File safeGetFile(String name) {
+    String fileName = safeGet(name, null)
+    fileName != null ? file(fileName) : null
 }
 
 // loads variables from a file to `project` so they can be `safeGet`-ed later
