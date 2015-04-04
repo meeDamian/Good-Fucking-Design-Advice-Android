@@ -9,7 +9,6 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -24,6 +23,7 @@ import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
 import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
 import android.view.View;
@@ -41,6 +41,7 @@ import com.meeDamian.lib.AutoResizeTextView;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Method;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
@@ -210,17 +211,12 @@ public class AdviceActivity extends Activity {
         view.buildDrawingCache();
 
         Bitmap b1 = view.getDrawingCache();
-        Rect frame = new Rect();
-        getWindow().getDecorView().getWindowVisibleDisplayFrame(frame);
 
-        int statusBarHeight = frame.top;
+        int[] dims = getScreenDimensions(getWindowManager().getDefaultDisplay());
+        int width = dims[0];
+        int height = dims[1];
 
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        int width = displayMetrics.widthPixels;
-        int height = displayMetrics.heightPixels;
-
-        Bitmap b = Bitmap.createBitmap(b1, 0, statusBarHeight, width, height - statusBarHeight);
+        Bitmap b = Bitmap.createBitmap(b1, 0, 0, width, height);
         view.destroyDrawingCache();
         share.setVisibility(View.VISIBLE);
         return b;
@@ -264,6 +260,36 @@ public class AdviceActivity extends Activity {
         return n == 1 || n == 2 || n == 3 ||
             n == 5 || n == 8 || n == 13 ||
             n == 21 || n == 34;
+    }
+
+    private int[] getScreenDimensions(Display display) {
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            display.getRealMetrics(displayMetrics);
+            return new int[] {
+                displayMetrics.widthPixels,
+                displayMetrics.heightPixels
+            };
+
+        } else return getLegacyScreenDimensions(display);
+    }
+
+    private int[] getLegacyScreenDimensions(Display display) {
+        int[] dimensions = {-1, -1};
+
+        try {
+            Method mGetRawW = Display.class.getMethod("getRawWidth");
+            Method mGetRawH = Display.class.getMethod("getRawHeight");
+
+            dimensions[0] = (Integer) mGetRawW.invoke(display);
+            dimensions[1] = (Integer) mGetRawH.invoke(display);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return dimensions;
     }
 
     // old AND softkey phones UI hider
