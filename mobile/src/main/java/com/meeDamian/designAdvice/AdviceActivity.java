@@ -85,7 +85,6 @@ public class AdviceActivity extends Activity {
         advice = (AutoResizeTextView) findViewById(R.id.advice);
         advice.setMovementMethod(LinkMovementMethod.getInstance());
         advice.setHighlightColor(Color.TRANSPARENT);
-//        adviceId = (TextView) findViewById(R.id.adviceId);
 
         share = (ImageButton) findViewById(R.id.share);
         share.setOnClickListener(new View.OnClickListener() {
@@ -171,10 +170,16 @@ public class AdviceActivity extends Activity {
         SpannableString spannedString = new SpannableString(a.getBody());
         int red = Color.rgb(248, 68, 68);
 
-        int curseStart = a.getBody().indexOf(CURSE_WORD_RAW);
+        int curseStart = a.getBody().toLowerCase().indexOf(CURSE_WORD_RAW);
 
         if (getCensorship()) {
             String censoredQuote = a.getBody().replace(CURSE_WORD_RAW, CURSE_WORD_CENSORED);
+            if (a.getBody().equals(censoredQuote))
+                censoredQuote = a.getBody().replace(
+                    capitalize(CURSE_WORD_RAW),
+                    capitalize(CURSE_WORD_CENSORED)
+                );
+
             spannedString = new SpannableString(censoredQuote);
             spannedString.setSpan(new ForegroundColorSpan(red), curseStart + 1, curseStart + CURSE_WORD_RAW.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
@@ -245,6 +250,10 @@ public class AdviceActivity extends Activity {
     }
     private void toggleCensorship() {
         setCensorship(!getCensorship());
+    }
+
+    private String capitalize(String s) {
+        return s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase();
     }
 
     private int getNumberOfLaunches() {

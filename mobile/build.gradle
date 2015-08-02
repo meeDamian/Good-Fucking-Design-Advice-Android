@@ -1,32 +1,28 @@
 apply plugin: 'com.android.application'
-apply plugin: 'play'
+apply plugin: 'com.github.triplet.play'
+apply plugin: 'com.getkeepsafe.dexcount'
+
+apply from: '../incrementAndExport.gradle'
+
 
 play {
     serviceAccountEmail = safeGet('PLAY_EMAIL')
-    pk12File = safeGetFile('PLAY_KEY')
+    pk12File            = safeGetFile('PLAY_KEY')
 }
 
-// read secret variables
-// IMPORTANT: must be above `android {}` declaration
-File secretPropsFile = file('../secret.properties')
-if (secretPropsFile.exists()) {
-    Properties p = new Properties()
-    p.load(new FileInputStream(secretPropsFile))
-    p.each { name, value ->
-        safeLoad name as String, value
-    }
-}
+loadSecrets()
 
 android {
     compileSdkVersion 22
-    buildToolsVersion "22.0.1"
+    buildToolsVersion "23.0.0 rc3"
 
     defaultConfig {
         applicationId "com.meeDamian.designAdvice"
         minSdkVersion 15
         targetSdkVersion 22
-        versionCode getBuildVersion(18)
-        versionName "1.7.1"
+
+        versionCode getVersionCode() as Integer
+        versionName getVersionName() as String
     }
 
     compileOptions {
@@ -36,10 +32,10 @@ android {
 
     signingConfigs {
         release {
-            storeFile safeGetFile('STORE_FILE')
-            storePassword safeGet('STORE_PASSWORD')
-            keyAlias safeGet('KEY_ALIAS')
-            keyPassword safeGet('KEY_PASSWORD', safeGet('STORE_PASSWORD'))
+            storeFile       safeGetFile('STORE_FILE') as File
+            storePassword   safeGet('STORE_PASSWORD') as String
+            keyAlias        safeGet('KEY_ALIAS') as String
+            keyPassword     safeGet('KEY_PASSWORD', safeGet('STORE_PASSWORD')) as String
         }
     }
 
@@ -49,50 +45,6 @@ android {
             signingConfig signingConfigs.release as Object
             minifyEnabled true
             zipAlignEnabled true
-
-            File releasesDir = new File(
-                safeGet('RELEASES_PARENT_DIR', '~/APKs'),
-                safeGet('FOLDER_NAME', project.group as String)
-            )
-            if (!releasesDir.exists())
-                releasesDir.mkdirs()
-
-            android.applicationVariants.all { variant ->
-                variant.outputs.each { output ->
-                    if (output.name == "release") {
-
-                        /* base file name in a form of:
-                            [package]-[versionType]-[versionName]-[versionCode]
-                            ex. com.meedamian.testApp-release-1.0.0-1111
-                        */
-                        String fileName = [
-                            defaultConfig.applicationId,
-                            project.name,
-                            defaultConfig.versionName,
-                            getBuildVersion(android.defaultConfig.versionCode, true)
-                        ].join('-')
-
-                        // rename output APK
-                        output.outputFile = new File(releasesDir, fileName + '.apk')
-
-                        // copy mappings.txt (JIC)
-                        if (variant.getBuildType().isMinifyEnabled()) {
-
-                            File mappingDir = new File(releasesDir, 'mappings')
-                            if (!mappingDir.exists())
-                                mappingDir.mkdirs()
-
-                            assemble << {
-                                copy {
-                                    from variant.mappingFile
-                                    into mappingDir
-                                    rename 'mapping.txt', "mapping-${fileName}.txt"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
         }
     }
 }
@@ -102,54 +54,12 @@ dependencies {
     compile project(':common')
     compile 'com.github.chester1000:AutoResizeTextView:1fe4c5a61c'
 
-    compile 'com.google.android.gms:play-services-analytics:7.0.0'
-    compile 'com.android.support:support-annotations:22.0.0'
-    compile 'com.android.support:appcompat-v7:22.0.0'
-    compile 'uk.co.chrisjenx:calligraphy:2.0.2'
+    compile 'com.google.android.gms:play-services-analytics:7.5.0'
+    compile 'com.android.support:support-annotations:22.2.1'
+    compile 'com.android.support:appcompat-v7:22.2.1'
+    compile 'uk.co.chrisjenx:calligraphy:2.1.0'
 
 //    compile 'com.android.support:support-v4:22.0.0'
 //    wearApp project(':wear')
 //    compile project(':libAutoResizeTextView')
-}
-
-// get variables && prevent crashing if missing
-String safeGet(String name, String defaultValue = '') {
-    hasProperty(name) ? project[name] : defaultValue
-}
-File safeGetFile(String name) {
-    String fileName = safeGet(name, null)
-    fileName != null ? file(fileName) : null
-}
-
-// loads variables from a file to `project` so they can be `safeGet`-ed later
-def safeLoad(String name, Object value, Boolean override = false) {
-    if (!hasProperty(name) || override)
-        project.set name, value
-}
-
-Integer getBuildVersion(defaultVersion, Boolean increment = false) {
-    File verFile = file('../version.properties')
-
-    if (!verFile.canRead())
-        verFile.createNewFile()
-
-    Properties props = new Properties()
-
-    props.load new FileInputStream(verFile)
-    String currentCodeVersion = props['VERSION_CODE']
-
-    if (currentCodeVersion == null)
-        currentCodeVersion = defaultVersion ?: android.defaultConfig.versionCode
-
-    if (increment) {
-        Integer bumpedCodeVersion = currentCodeVersion.toInteger() + 1
-        android.defaultConfig.versionCode = bumpedCodeVersion
-
-        props['VERSION_CODE'] = bumpedCodeVersion.toString()
-
-        props.store verFile.newWriter(), "Build version updated with each release build"
-        currentCodeVersion = bumpedCodeVersion
-    }
-
-    currentCodeVersion as Integer
 }
