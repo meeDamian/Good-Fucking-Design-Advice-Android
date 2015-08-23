@@ -13,13 +13,13 @@ play {
 loadSecrets()
 
 android {
-    compileSdkVersion 22
-    buildToolsVersion "23.0.0 rc3"
+    compileSdkVersion 23
+    buildToolsVersion "23.0.0"
 
     defaultConfig {
         applicationId "com.meeDamian.designAdvice"
         minSdkVersion 15
-        targetSdkVersion 22
+        targetSdkVersion 23
 
         versionCode getVersionCode() as Integer
         versionName getVersionName() as String
@@ -54,9 +54,9 @@ dependencies {
     compile project(':common')
     compile 'com.github.chester1000:AutoResizeTextView:1fe4c5a61c'
 
-    compile 'com.google.android.gms:play-services-analytics:7.5.0'
-    compile 'com.android.support:support-annotations:22.2.1'
-    compile 'com.android.support:appcompat-v7:22.2.1'
+    compile 'com.google.android.gms:play-services-analytics:7.8.0'
+    compile 'com.android.support:support-annotations:23.0.0'
+    compile 'com.android.support:appcompat-v7:23.0.0'
     compile 'uk.co.chrisjenx:calligraphy:2.1.0'
 
 //    compile 'com.android.support:support-v4:22.0.0'
